@@ -1,0 +1,2 @@
+# VocabBuilder
+You are a foreign language learner reading an article in the language you want to learn. You come across a word you don't know; what you would usually do is use google translate to get the translation, and then that's it. But a few days later, when you see the word again, do you remember it? No - that's why you need Quizlet. So, instead of just translating it, this app will add a flash card of that word with the translation to your study deck. Now, you can review all the words that you've come across so that you can learn it for next time!
