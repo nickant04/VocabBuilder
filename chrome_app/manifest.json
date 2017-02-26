@@ -13,9 +13,11 @@
     "default_title": "Click here!",
     "persistent": false
   },
+
   "permissions": [
     "activeTab",
     "storage",
+    "http://code.jquery.com/*",
     "https://ajax.googleapis.com/",
     "identity",
     "https://quizlet.com/*",

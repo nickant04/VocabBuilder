@@ -10,7 +10,7 @@ var vb = function() {
 		var client_secret = ""
 		var url = "https://quizlet.com/authorize?response_type=code" +
 				"&client_id=" + client_id +
-				"&scope=read&" +
+				"&scope=read%20write_set&" +
 				"state=" + state; 
 		var code; 
 		access_token = null; 
@@ -26,10 +26,10 @@ var vb = function() {
 				chrome.identity.launchWebAuthFlow(
 				  {'url': url, 'interactive': true},
 				  function(redirect_url) { 
-				  	if (chrome.runtime.lastError) {
-				        callback(new Error(chrome.runtime.lastError));
-				        return;
-				    }
+				  	// if (chrome.runtime.lastError) {
+				   //      callback(new Error(chrome.runtime.lastError));
+				   //      return;
+				   //  }
 				  	console.log(redirect_url); 
 				  	code = redirect_url.split('code=')[1]; 
 					console.log(code); 
@@ -51,7 +51,7 @@ var vb = function() {
 
 				        	console.log(token); 
 				        	setAccessToken(token); 
-				        	
+
 		            	}
 				   	};
 				   	var params = "grant_type=authorization_code&code=" + code + 
@@ -62,6 +62,10 @@ var vb = function() {
 
 				function setAccessToken(token) {
 		        	access_token = token;
+		        	chrome.storage.sync.set({'token': token}, function() {
+			          // Notify that we saved.
+			          console.log('Settings saved');
+			        });
 		        	callback(null, access_token);
 		        }
 			}, //getToken
@@ -90,17 +94,50 @@ var vb = function() {
 		    	console.log(acc_token);
 		    	console.log(error); 
 		    	console.log(access_token); 
+		    	// if (error === null) {
+		    	// 	sendTerms(); 
+		    	// }
 	    	});
+
+	  //   	function sendTerms() {
+	  //   		$.ajax({
+			//         type: "POST",
+			//         contentType: "application/json; charset=UTF-8",
+			//         headers: {
+		 //    			"Authorization": "Bearer " + access_token
+		 //  			},
+			//         data: JSON.stringify({
+			//             "term": "cuatro",
+			//             "definition": "four"
+		 //        	}),
+			//         url: "https://api.quizlet.com/2.0/sets/191545616/terms",
+			//         success : function(data) {
+			//         	console.log(data); 
+			//         },
+			//         error : function(response) {
+			//         	console.log(response); 
+			//         }
+		 //    	});
+			// }
 		}
 	 } 
 }; 
 
-var sendTerms = function() {
+//https://api.quizlet.com/2.0/sets/191545616/terms
+//191545616
 
-}
+// chrome.tabs.executeScript( {
+// 	  code: "window.getSelection().toString();"
+// 	}, function(selection) {
+// 	  console.log(selection);
+// });
 
 var a = vb(); 
 window.onload = a.onload();
+
+
+
+
 
 
 
