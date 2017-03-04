@@ -1,12 +1,13 @@
+'use strict'; 
+
 var vb = function() {
-	'use strict'; 
 
 	var access_token; 
 	var user_id; 
 
 	var tokenFetcher = function () {
 		var client_id = "e4PPjEWjHf"; 
-		var state = "random";;
+		var state = "random"; // update
 		var client_secret = ""
 		var url = "https://quizlet.com/authorize?response_type=code" +
 				"&client_id=" + client_id +
@@ -26,10 +27,10 @@ var vb = function() {
 				chrome.identity.launchWebAuthFlow(
 				  {'url': url, 'interactive': true},
 				  function(redirect_url) { 
-				  	// if (chrome.runtime.lastError) {
-				   //      callback(new Error(chrome.runtime.lastError));
-				   //      return;
-				   //  }
+				  	if (chrome.runtime.lastError) {
+				        callback(new Error(chrome.runtime.lastError));
+				        return;
+				    }
 				  	console.log(redirect_url); 
 				  	code = redirect_url.split('code=')[1]; 
 					console.log(code); 
@@ -72,9 +73,14 @@ var vb = function() {
 
 
 			removeCachedToken: function(token_to_remove) {
-		        if (access_token == token_to_remove)
-		          access_token = null;
-		    },
+		        if (access_token == token_to_remove) {
+		          	access_token = null;
+		      		chrome.storage.sync.set({'token': null}, function() {
+			          // Notify that we saved.
+			          console.log('token set to null');
+			        });
+		      	}
+		    }
 
 		} //return
 	}; // tokenFetcher
@@ -87,40 +93,39 @@ var vb = function() {
 	// });
 
 	return {
-	    onload: function() {
-	    	console.log("here"); 
+	    login: function() {
+	    	console.log("onload"); 
 	    	var b = tokenFetcher(); 
 		    b.getToken(true, function(error, acc_token) {
 		    	console.log(acc_token);
 		    	console.log(error); 
 		    	console.log(access_token); 
-		    	// if (error === null) {
-		    	// 	sendTerms(); 
-		    	// }
+		    	if (access_token) {
+		    		console.log("successful");
+		    		$("#login").attr('value', 'Logout');
+		    	}
 	    	});
+		}, // onload
 
-	  //   	function sendTerms() {
-	  //   		$.ajax({
-			//         type: "POST",
-			//         contentType: "application/json; charset=UTF-8",
-			//         headers: {
-		 //    			"Authorization": "Bearer " + access_token
-		 //  			},
-			//         data: JSON.stringify({
-			//             "term": "cuatro",
-			//             "definition": "four"
-		 //        	}),
-			//         url: "https://api.quizlet.com/2.0/sets/191545616/terms",
-			//         success : function(data) {
-			//         	console.log(data); 
-			//         },
-			//         error : function(response) {
-			//         	console.log(response); 
-			//         }
-		 //    	});
-			// }
-		}
-	 } 
+		checkLogin: function(callback) {
+			chrome.storage.sync.get("token", function(access_token){
+		        if (access_token.token) {
+		            callback(true); 
+		        } else {
+		            callback(false); 
+		        }
+	    	}); 
+		},// checkLogin
+
+		logout: function() {
+			var remove = tokenFetcher();
+			remove.removeCachedToken(access_token); 
+			if (!access_token) {
+				console.log("token removal sucessful"); 
+				$("#login").attr('value', 'Login!'); 
+			}
+		} // logout
+	} // return
 }; 
 
 //https://api.quizlet.com/2.0/sets/191545616/terms
@@ -132,9 +137,22 @@ var vb = function() {
 // 	  console.log(selection);
 // });
 
-var a = vb(); 
-window.onload = a.onload();
+document.addEventListener('DOMContentLoaded', function() {
+ 	document.getElementById("login").addEventListener("click", go);
+});
 
+var a = vb();
+function go() {
+	console.log("GO");  
+	a.checkLogin(function(loggedin) {
+		if (!loggedin) {
+			a.login();
+		} else {
+			a.logout(); 
+		}
+	});
+	
+}
 
 
 
