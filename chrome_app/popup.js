@@ -59,24 +59,6 @@ function learn() {
                 var definition = "something"; 
                 chrome.storage.sync.get("token", function(access_token){
                     console.log(access_token.token); 
-                    // $.ajax({
-                    //     type: "POST",
-                    //     contentType: "application/json; charset=UTF-8",
-                    //     headers: {
-                    //     "Authorization: Bearer ": access_token
-                    //   },
-                    //     data: JSON.stringify({
-                    //         "term": term,
-                    //         "definition": definition
-                    //     }),
-                    //     url: "https://api.quizlet.com/2.0/sets/191545616/terms",
-                    //     success : function(data) {
-                    //       console.log(data); 
-                    //     },
-                    //     error : function(response) {
-                    //       console.log(response); 
-                    //     }
-                    // });
                     var xhr = new XMLHttpRequest();
                     xhr.open('POST', 'https://api.quizlet.com/2.0/sets/191545616/terms');
                     xhr.setRequestHeader('Content-Type', 'application/x-www-form-urlencoded; charset=UTF-8');
